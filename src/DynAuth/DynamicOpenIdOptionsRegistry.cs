@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+﻿using DynAuth.Abstraction;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace DynAuth;
 
-public class DynamicOpenIdOptionsRegistry
+public class DynamicOpenIdOptionsRegistry : IDynamicOpenIdOptionsRegistry
 {
     private readonly Dictionary<string, OpenIdConnectOptions> _registry = new(StringComparer.OrdinalIgnoreCase);
 
