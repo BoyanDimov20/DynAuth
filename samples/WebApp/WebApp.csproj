@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\DynAuth.OpenIdConnect\DynAuth.OpenIdConnect.csproj" />
+      <ProjectReference Include="..\..\src\DynAuth.Saml2\DynAuth.Saml2.csproj" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.15" />

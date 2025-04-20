@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace DynAuth;
 
-public class DynamicSchemeManager<TOptions> : IDynamicSchemeManager<TOptions> where TOptions : class, new()
+internal class DynamicSchemeManager<TOptions> : IDynamicSchemeManager<TOptions> where TOptions : class, new()
 {
     private readonly IAuthenticationSchemeProvider _schemeProvider;
     private readonly IOptionsMonitorCache<TOptions> _optionsCache;

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace DynAuth;
 
-public class DynamicOpenIdOptionsFactory<TOptions> : IOptionsFactory<TOptions> where TOptions : class, new()
+internal class DynamicOpenIdOptionsFactory<TOptions> : IOptionsFactory<TOptions> where TOptions : class, new()
 {
     private readonly IEnumerable<IConfigureOptions<TOptions>> _configurators;
     private readonly IEnumerable<IPostConfigureOptions<TOptions>> _postConfigurators;

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace DynAuth;
 
-public class DynamicOpenIdOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
+internal class DynamicOpenIdOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
 {
     private readonly ConcurrentDictionary<string, TOptions> _options = new();
 

@@ -1,4 +1,5 @@
 using DynAuth.OpenIdConnect;
+using DynAuth.Saml2;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,11 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDynAuthOpenIdConnect();
-
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddOpenIdConnect();
+    .AddDynAuthOpenIdConnect()
+    .AddDynAuthSaml();
+
 
 
 

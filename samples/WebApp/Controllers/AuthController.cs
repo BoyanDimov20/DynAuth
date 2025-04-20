@@ -1,23 +1,30 @@
 ﻿using System.Security.Claims;
 using DynAuth.Abstraction;
 using DynAuth.OpenIdConnect.Abstraction;
+using DynAuth.Saml2.Abstraction;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc;
+using Sustainsys.Saml2;
+using Sustainsys.Saml2.AspNetCore2;
+using Sustainsys.Saml2.Metadata;
+using Sustainsys.Saml2.WebSso;
 
 namespace WebApp.Controllers;
 
 public class AuthController : Controller
 {
     private readonly IOidcSchemeManager _oidcSchemeManager;
+    private readonly ISamlSchemeManager _samlSchemeManager;
 
-    public AuthController(IOidcSchemeManager oidcSchemeManager)
+    public AuthController(IOidcSchemeManager oidcSchemeManager, ISamlSchemeManager samlSchemeManager)
     {
         _oidcSchemeManager = oidcSchemeManager;
+        _samlSchemeManager = samlSchemeManager;
     }
 
-    public async Task<IActionResult> AddScheme()
+    public IActionResult AddOidcScheme()
     {
         var options = new OpenIdConnectOptions
         {
@@ -32,7 +39,34 @@ public class AuthController : Controller
         
         _oidcSchemeManager.AddOidcScheme("google-test", options);
 
-        return Ok("Scheme added. Now visit /auth/login/google-test");
+        return Ok("Scheme added. Now visit /auth/login?scheme=google-test");
+    }
+    
+    public IActionResult AddSamlScheme()
+    {
+        var options = new Saml2Options
+        {
+            SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme,
+            SPOptions =
+            {
+                EntityId = new EntityId("https://localhost:7119"),
+                ModulePath = "/signin-azure-saml2"
+            }
+        };
+        
+        var idp = new IdentityProvider(new EntityId("https://sts.windows.net/16e2eac8-c69c-4976-919b-4c3a48c2c0f7/"),
+            options.SPOptions)
+        {
+            Binding = Saml2BindingType.HttpPost,
+            LoadMetadata = true,
+            MetadataLocation = "https://login.microsoftonline.com/16e2eac8-c69c-4976-919b-4c3a48c2c0f7/federationmetadata/2007-06/federationmetadata.xml?appid=b88b09ee-52b4-4454-8c1f-fee87cf6db58"
+        };
+
+        options.IdentityProviders.Add(idp);
+        
+        _samlSchemeManager.AddSamlScheme("azure", options);
+
+        return Ok("Scheme added. Now visit /auth/login?scheme=azure");
     }
 
     public IActionResult Login(string scheme)

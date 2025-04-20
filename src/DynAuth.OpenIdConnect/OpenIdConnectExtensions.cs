@@ -1,14 +1,17 @@
 ﻿using DynAuth.OpenIdConnect.Abstraction;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace DynAuth.OpenIdConnect;
 
 public static class OpenIdConnectExtensions
 {
-    public static void AddDynAuthOpenIdConnect(this IServiceCollection services)
+    public static AuthenticationBuilder AddDynAuthOpenIdConnect(this AuthenticationBuilder builder)
     {
-        services.AddDynAuth<OpenIdConnectOptions>()
+        builder.Services.AddDynAuth<OpenIdConnectOptions>()
             .AddTransient<IOidcSchemeManager, OidcSchemeManager>();
-        
+
+        builder.AddOpenIdConnect();
+        return builder;
     }
 }
