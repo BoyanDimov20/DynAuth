@@ -1,8 +1,9 @@
 ﻿using DynAuth.Abstraction;
+using Microsoft.AspNetCore.Authentication;
 
 namespace DynAuth;
 
-internal class DynamicOpenIdOptionsRegistry<TOptions> : IDynamicOpenIdOptionsRegistry<TOptions> where TOptions : class, new()
+internal class DynamicOpenIdOptionsRegistry<TOptions> : IDynamicOpenIdOptionsRegistry<TOptions> where TOptions : AuthenticationSchemeOptions
 {
     private readonly Dictionary<string, TOptions> _registry = new(StringComparer.OrdinalIgnoreCase);
 

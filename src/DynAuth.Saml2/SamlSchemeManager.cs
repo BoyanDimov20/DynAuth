@@ -24,10 +24,6 @@ internal class SamlSchemeManager : ISamlSchemeManager
         ArgumentNullException.ThrowIfNull(options);
         ArgumentException.ThrowIfNullOrEmpty(schemeName);
 
-        _optionsRegistry.RegisterBaseOptions(schemeName, options);
-        var finalOptions = _optionsFactory.Create(schemeName);
-        finalOptions.Validate();
-
-        _schemeManager.AddScheme(schemeName, finalOptions, typeof(Saml2Handler));
+        _schemeManager.AddScheme(schemeName, options, typeof(Saml2Handler));
     }
 }

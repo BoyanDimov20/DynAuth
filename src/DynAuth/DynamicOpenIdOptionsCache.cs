@@ -1,9 +1,10 @@
 ﻿using System.Collections.Concurrent;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
 namespace DynAuth;
 
-internal class DynamicOpenIdOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
+internal class DynamicOpenIdOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : AuthenticationSchemeOptions
 {
     private readonly ConcurrentDictionary<string, TOptions> _options = new();
 

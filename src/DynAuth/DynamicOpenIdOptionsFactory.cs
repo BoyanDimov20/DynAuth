@@ -1,9 +1,10 @@
 ﻿using DynAuth.Abstraction;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
 namespace DynAuth;
 
-internal class DynamicOpenIdOptionsFactory<TOptions> : IOptionsFactory<TOptions> where TOptions : class, new()
+internal class DynamicOpenIdOptionsFactory<TOptions> : IOptionsFactory<TOptions> where TOptions : AuthenticationSchemeOptions, new()
 {
     private readonly IEnumerable<IConfigureOptions<TOptions>> _configurators;
     private readonly IEnumerable<IPostConfigureOptions<TOptions>> _postConfigurators;
