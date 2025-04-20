@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-
+﻿
 namespace DynAuth.Abstraction;
 
-public interface IDynamicSchemeManager
+public interface IDynamicSchemeManager<TOptions> where TOptions : class
 {
-    Task AddOpenIdSchemeAsync(string schemeName, OpenIdConnectOptions options);
+    void AddScheme(string schemeName, TOptions options, Type handler);
 }

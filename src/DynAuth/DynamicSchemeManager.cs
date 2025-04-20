@@ -1,50 +1,34 @@
-﻿using System.Text;
-using DynAuth.Abstraction;
+﻿using DynAuth.Abstraction;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Protocols;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace DynAuth;
 
-public class DynamicSchemeManager : IDynamicSchemeManager
+public class DynamicSchemeManager<TOptions> : IDynamicSchemeManager<TOptions> where TOptions : class, new()
 {
     private readonly IAuthenticationSchemeProvider _schemeProvider;
-    private readonly IOptionsMonitorCache<OpenIdConnectOptions> _optionsCache;
-    private readonly IOptionsFactory<OpenIdConnectOptions> _optionsFactory;
-    private readonly IDynamicOpenIdOptionsRegistry _optionsRegistry;
+    private readonly IOptionsMonitorCache<TOptions> _optionsCache;
 
     public DynamicSchemeManager(
         IAuthenticationSchemeProvider schemeProvider,
-        IOptionsMonitorCache<OpenIdConnectOptions> optionsCache,
-        IOptionsFactory<OpenIdConnectOptions> optionsFactory,
-        IDynamicOpenIdOptionsRegistry optionsRegistry)
+        IOptionsMonitorCache<TOptions> optionsCache)
     {
         _schemeProvider = schemeProvider;
         _optionsCache = optionsCache;
-        _optionsFactory = optionsFactory;
-        _optionsRegistry = optionsRegistry;
     }
 
-    public Task AddOpenIdSchemeAsync(string schemeName, OpenIdConnectOptions options)
+    public void AddScheme(string schemeName, TOptions options, Type handler)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentException.ThrowIfNullOrEmpty(schemeName);
         
-        options.Validate();
-
-        _optionsRegistry.RegisterBaseOptions(schemeName, options);
-        var finalOptions = _optionsFactory.Create(schemeName);
-        _optionsCache.TryAdd(schemeName, finalOptions);
-        
+        _optionsCache.TryAdd(schemeName, options);
 
         // Register the scheme
-        var scheme = new AuthenticationScheme(schemeName, schemeName, typeof(OpenIdConnectHandler));
+        var scheme = new AuthenticationScheme(schemeName, schemeName, handler);
         _schemeProvider.AddScheme(scheme);
 
-        return Task.CompletedTask;
     }
+
+    
 }

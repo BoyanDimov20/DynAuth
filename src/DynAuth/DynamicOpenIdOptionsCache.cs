@@ -1,14 +1,13 @@
 ﻿using System.Collections.Concurrent;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
 
 namespace DynAuth;
 
-public class DynamicOpenIdOptionsCache : IOptionsMonitorCache<OpenIdConnectOptions>
+public class DynamicOpenIdOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
 {
-    private readonly ConcurrentDictionary<string, OpenIdConnectOptions> _options = new();
+    private readonly ConcurrentDictionary<string, TOptions> _options = new();
 
-    public bool TryAdd(string? name, OpenIdConnectOptions options)
+    public bool TryAdd(string? name, TOptions options)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
 
@@ -22,7 +21,7 @@ public class DynamicOpenIdOptionsCache : IOptionsMonitorCache<OpenIdConnectOptio
         return _options.TryRemove(name, out _);
     }
 
-    public OpenIdConnectOptions GetOrAdd(string? name, Func<OpenIdConnectOptions> createOptions)
+    public TOptions GetOrAdd(string? name, Func<TOptions> createOptions)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
 

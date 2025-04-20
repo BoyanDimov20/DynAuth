@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+﻿namespace DynAuth.Abstraction;
 
-namespace DynAuth.Abstraction;
-
-public interface IDynamicOpenIdOptionsRegistry
+public interface IDynamicOpenIdOptionsRegistry<TOptions> where TOptions : class
 {
-    public void RegisterBaseOptions(string scheme, OpenIdConnectOptions options);
-    public bool TryGet(string scheme, out OpenIdConnectOptions options);
+    public void RegisterBaseOptions(string scheme, TOptions options);
+    public bool TryGet(string scheme, out TOptions options);
 }

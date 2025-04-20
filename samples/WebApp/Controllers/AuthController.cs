@@ -1,27 +1,36 @@
 ﻿using System.Security.Claims;
-using DynAuth;
+using DynAuth.Abstraction;
+using DynAuth.OpenIdConnect.Abstraction;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApp.Controllers;
 
 public class AuthController : Controller
 {
-    private readonly DynamicSchemeManager _schemeManager;
+    private readonly IOidcSchemeManager _oidcSchemeManager;
 
-    public AuthController(DynamicSchemeManager schemeManager)
+    public AuthController(IOidcSchemeManager oidcSchemeManager)
     {
-        _schemeManager = schemeManager;
+        _oidcSchemeManager = oidcSchemeManager;
     }
 
     public async Task<IActionResult> AddScheme()
     {
-        await _schemeManager.AddOpenIdSchemeAsync(
-            schemeName: "google-test",
-            authority: "https://accounts.google.com",
-            clientId: "978248021337-4h6k77vcouc9r4dihb9su29540d4m0ki.apps.googleusercontent.com",
-            clientSecret: "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"
-        );
+        var options = new OpenIdConnectOptions
+        {
+            SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme,
+            Authority = "https://accounts.google.com",
+            ClientId = "978248021337-4h6k77vcouc9r4dihb9su29540d4m0ki.apps.googleusercontent.com",
+            ClientSecret = "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",
+            ResponseType = "code",
+            SaveTokens = true,
+            CallbackPath = $"/signin-google-test",
+        };
+        
+        _oidcSchemeManager.AddOidcScheme("google-test", options);
 
         return Ok("Scheme added. Now visit /auth/login/google-test");
     }

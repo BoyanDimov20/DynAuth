@@ -1,15 +1,14 @@
 ﻿using DynAuth.Abstraction;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace DynAuth;
 
-public class DynamicOpenIdOptionsRegistry : IDynamicOpenIdOptionsRegistry
+public class DynamicOpenIdOptionsRegistry<TOptions> : IDynamicOpenIdOptionsRegistry<TOptions> where TOptions : class, new()
 {
-    private readonly Dictionary<string, OpenIdConnectOptions> _registry = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, TOptions> _registry = new(StringComparer.OrdinalIgnoreCase);
 
-    public void RegisterBaseOptions(string scheme, OpenIdConnectOptions options)
+    public void RegisterBaseOptions(string scheme, TOptions options)
         => _registry[scheme] = options;
 
-    public bool TryGet(string scheme, out OpenIdConnectOptions options)
+    public bool TryGet(string scheme, out TOptions options)
         => _registry.TryGetValue(scheme, out options);
 }

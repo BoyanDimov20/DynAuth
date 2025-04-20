@@ -1,33 +1,33 @@
-﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+﻿using DynAuth.Abstraction;
 using Microsoft.Extensions.Options;
 
 namespace DynAuth;
 
-public class DynamicOpenIdOptionsFactory : IOptionsFactory<OpenIdConnectOptions>
+public class DynamicOpenIdOptionsFactory<TOptions> : IOptionsFactory<TOptions> where TOptions : class, new()
 {
-    private readonly IEnumerable<IConfigureOptions<OpenIdConnectOptions>> _configurators;
-    private readonly IEnumerable<IPostConfigureOptions<OpenIdConnectOptions>> _postConfigurators;
-    private readonly DynamicOpenIdOptionsRegistry _registry;
+    private readonly IEnumerable<IConfigureOptions<TOptions>> _configurators;
+    private readonly IEnumerable<IPostConfigureOptions<TOptions>> _postConfigurators;
+    private readonly IDynamicOpenIdOptionsRegistry<TOptions> _registry;
 
     public DynamicOpenIdOptionsFactory(
-        IEnumerable<IConfigureOptions<OpenIdConnectOptions>> configurators,
-        IEnumerable<IPostConfigureOptions<OpenIdConnectOptions>> postConfigurators,
-        DynamicOpenIdOptionsRegistry registry)
+        IEnumerable<IConfigureOptions<TOptions>> configurators,
+        IEnumerable<IPostConfigureOptions<TOptions>> postConfigurators,
+        IDynamicOpenIdOptionsRegistry<TOptions> registry)
     {
         _configurators = configurators;
         _postConfigurators = postConfigurators;
         _registry = registry;
     }
 
-    public OpenIdConnectOptions Create(string name)
+    public TOptions Create(string name)
     {
         var options = _registry.TryGet(name, out var baseOptions)
             ? baseOptions
-            : new OpenIdConnectOptions();
+            : new TOptions();
 
         foreach (var config in _configurators)
         {
-            if (config is IConfigureNamedOptions<OpenIdConnectOptions> named)
+            if (config is IConfigureNamedOptions<TOptions> named)
                 named.Configure(name, options);
             else
                 config.Configure(options);
