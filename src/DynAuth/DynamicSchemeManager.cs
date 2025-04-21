@@ -1,79 +1,50 @@
-﻿using System.Text;
-using DynAuth.Abstraction;
+﻿using DynAuth.Abstraction;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Protocols;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace DynAuth;
 
-public class DynamicSchemeManager : IDynamicSchemeManager
+internal class DynamicSchemeManager<TOptions> : IDynamicSchemeManager<TOptions> where TOptions : AuthenticationSchemeOptions
 {
     private readonly IAuthenticationSchemeProvider _schemeProvider;
-    private readonly IOptionsMonitorCache<OpenIdConnectOptions> _optionsCache;
-    private readonly IOptionsFactory<OpenIdConnectOptions> _optionsFactory;
-    private readonly DynamicOpenIdOptionsRegistry _optionsRegistry;
+    private readonly IOptionsMonitorCache<TOptions> _optionsCache;
+    private readonly IDynamicOpenIdOptionsRegistry<TOptions> _optionsRegistry;
+    private readonly IOptionsFactory<TOptions> _optionsFactory;
 
     public DynamicSchemeManager(
         IAuthenticationSchemeProvider schemeProvider,
-        IOptionsMonitorCache<OpenIdConnectOptions> optionsCache,
-        IOptionsFactory<OpenIdConnectOptions> optionsFactory,
-        DynamicOpenIdOptionsRegistry optionsRegistry)
+        IOptionsMonitorCache<TOptions> optionsCache, 
+        IDynamicOpenIdOptionsRegistry<TOptions> optionsRegistry,
+        IOptionsFactory<TOptions> optionsFactory)
     {
         _schemeProvider = schemeProvider;
         _optionsCache = optionsCache;
-        _optionsFactory = optionsFactory;
         _optionsRegistry = optionsRegistry;
+        _optionsFactory = optionsFactory;
     }
 
-    public Task AddOpenIdSchemeAsync(string schemeName, string authority, string clientId, string clientSecret)
+    public void AddScheme(string schemeName, TOptions options, Type handler)
     {
-        var handlerType = typeof(OpenIdConnectHandler);
-
-        // Add to options manually
-        var options = new OpenIdConnectOptions
-        {
-            SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme,
-            Authority = authority,
-            ClientId = clientId,
-            ClientSecret = clientSecret,
-            ResponseType = "code",
-            SaveTokens = true,
-            CallbackPath = $"/signin-{schemeName}",
-        };
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentException.ThrowIfNullOrEmpty(schemeName);
+        
         _optionsRegistry.RegisterBaseOptions(schemeName, options);
-        
         var finalOptions = _optionsFactory.Create(schemeName);
-
-        // Register in the options monitor cache (advanced: requires custom implementation if needed)
-        _optionsCache.TryAdd(schemeName, finalOptions);
+        finalOptions.Validate();
         
+        _optionsCache.TryAdd(schemeName, finalOptions);
 
         // Register the scheme
-        var scheme = new AuthenticationScheme(schemeName, schemeName, handlerType);
+        var scheme = new AuthenticationScheme(schemeName, schemeName, handler);
         _schemeProvider.AddScheme(scheme);
 
-        return Task.CompletedTask;
     }
 
-
-    public Task AddOpenIdSchemeAsync(string schemeName, OpenIdConnectOptions options)
+    public void RemoveScheme(string schemeName)
     {
-        _optionsRegistry.RegisterBaseOptions(schemeName, options);
+        ArgumentException.ThrowIfNullOrEmpty(schemeName);
         
-        var finalOptions = _optionsFactory.Create(schemeName);
-
-        // Register in the options monitor cache (advanced: requires custom implementation if needed)
-        _optionsCache.TryAdd(schemeName, finalOptions);
-        
-
-        // Register the scheme
-        var scheme = new AuthenticationScheme(schemeName, schemeName, typeof(OpenIdConnectHandler));
-        _schemeProvider.AddScheme(scheme);
-
-        return Task.CompletedTask;
+        _optionsCache.TryRemove(schemeName);
+        _schemeProvider.RemoveScheme(schemeName);
     }
 }
