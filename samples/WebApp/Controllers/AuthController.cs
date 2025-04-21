@@ -30,8 +30,8 @@ public class AuthController : Controller
         {
             SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme,
             Authority = "https://accounts.google.com",
-            ClientId = "978248021337-4h6k77vcouc9r4dihb9su29540d4m0ki.apps.googleusercontent.com",
-            ClientSecret = "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",
+            ClientId = "978248021337-4h6k77vcouc9r4dihb9su29540d4m0ki.apps.example.com",
+            ClientSecret = "*",
             ResponseType = "code",
             SaveTokens = true,
             CallbackPath = $"/signin-google-test",
@@ -54,12 +54,12 @@ public class AuthController : Controller
             }
         };
         
-        var idp = new IdentityProvider(new EntityId("https://sts.windows.net/16e2eac8-c69c-4976-919b-4c3a48c2c0f7/"),
+        var idp = new IdentityProvider(new EntityId("https://sts.windows.net/example/"),
             options.SPOptions)
         {
             Binding = Saml2BindingType.HttpPost,
             LoadMetadata = true,
-            MetadataLocation = "https://login.microsoftonline.com/16e2eac8-c69c-4976-919b-4c3a48c2c0f7/federationmetadata/2007-06/federationmetadata.xml?appid=b88b09ee-52b4-4454-8c1f-fee87cf6db58"
+            MetadataLocation = "https://login.microsoftonline.com/16e2eac8-c69c-4976-919b-4c3a48c2c0f7/federationmetadata/2007-06/federationmetadata.xml?appid=example"
         };
 
         options.IdentityProviders.Add(idp);
