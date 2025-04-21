@@ -40,5 +40,11 @@ internal class DynamicSchemeManager<TOptions> : IDynamicSchemeManager<TOptions> 
 
     }
 
-    
+    public void RemoveScheme(string schemeName)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(schemeName);
+        
+        _optionsCache.TryRemove(schemeName);
+        _schemeProvider.RemoveScheme(schemeName);
+    }
 }

@@ -37,7 +37,7 @@ public class AuthController : Controller
             CallbackPath = $"/signin-google-test",
         };
         
-        _oidcSchemeManager.AddOidcScheme("google-test", options);
+        _oidcSchemeManager.AddScheme("google-test", options);
 
         return Ok("Scheme added. Now visit /auth/login?scheme=google-test");
     }
@@ -64,38 +64,27 @@ public class AuthController : Controller
 
         options.IdentityProviders.Add(idp);
         
-        _samlSchemeManager.AddSamlScheme("azure", options);
+        _samlSchemeManager.AddScheme("azure", options);
 
         return Ok("Scheme added. Now visit /auth/login?scheme=azure");
+    }
+
+    public IActionResult RemoveSamlScheme()
+    {
+        _samlSchemeManager.RemoveScheme("azure");
+        
+        return Ok("Scheme removed. Visit /auth/login?scheme=azure to ensure it is removed.");
     }
 
     public IActionResult Login(string scheme)
     {
         var props = new AuthenticationProperties
         {
-            RedirectUri = Url.Action(nameof(Callback)),
-            Items =
-            {
-                { "returnUrl", "/" },
-                { "scheme", scheme },
-            }
+            RedirectUri = Url.Action(nameof(Callback))
         };
         return Challenge(props, scheme);
     }
     
-    public async Task<IActionResult> TestSignIn()
-    {
-        var identity = new ClaimsIdentity(new[]
-        {
-            new Claim(ClaimTypes.Name, "Test User")
-        }, "Cookies");
-
-        var principal = new ClaimsPrincipal(identity);
-        await HttpContext.SignInAsync("Cookies", principal);
-
-        return Ok("Signed in");
-    }
-
     public IActionResult Callback()
     {
         return Json(User.Claims.Select(c => new { c.Type, c.Value }));

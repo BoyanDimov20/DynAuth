@@ -4,5 +4,6 @@ namespace DynAuth.OpenIdConnect.Abstraction;
 
 public interface IOidcSchemeManager
 {
-    void AddOidcScheme(string schemeName, OpenIdConnectOptions options);
+    void AddScheme(string schemeName, OpenIdConnectOptions options);
+    void RemoveScheme(string schemeName);
 }
