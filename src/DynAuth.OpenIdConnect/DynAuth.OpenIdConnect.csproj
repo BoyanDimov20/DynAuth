@@ -5,6 +5,15 @@
         <TargetFrameworks>net7.0;net8.0;net9.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Title>DynAuth.OpenIdConnect</Title>
+        <Authors>BoyanDimov20</Authors>
+        <Description>DynAuth is a flexible authentication library for .NET applications, providing support for multiple authentication protocols including SAML2 and OpenID Connect. This is useful for multi-tenant apps or when your identity provider setup is not static.</Description>
+        <RepositoryUrl>https://github.com/BoyanDimov20/DynAuth</RepositoryUrl>
+        <PackageTags>dynamic authentication, authentication, oidc, saml</PackageTags>
+        <IsPackable>true</IsPackable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
@@ -21,6 +30,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\DynAuth\DynAuth.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="../../README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
 </Project>
